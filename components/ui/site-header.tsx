@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { getSession } from "@/lib/authentication";
+import { signOutAction } from "@/lib/auth-actions";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -21,16 +24,13 @@ const pages = [
     label: "Pricing",
     description: "See plans and choose what fits.",
   },
-  {
-    href: "/login",
-    label: "Login",
-    description: "Sign in to your Agent.AI account.",
-  },
 ] as const;
 
-export default function SiteHeader() {
+export default async function SiteHeader() {
+  const session = await getSession();
+
   return (
-    <header className="border-b px-6 py-4">
+    <header className="flex items-center justify-between gap-4 border-b px-6 py-4">
       <NavigationMenu>
         <NavigationMenuList>
           <NavigationMenuItem>
@@ -64,6 +64,32 @@ export default function SiteHeader() {
           ))}
         </NavigationMenuList>
       </NavigationMenu>
+
+      {session?.user ? (
+        <div className="flex items-center gap-3">
+          <span className="hidden text-sm text-muted-foreground sm:inline">
+            {session.user.email}
+          </span>
+          <form action={signOutAction}>
+            <Button type="submit" variant="outline">
+              Sign out
+            </Button>
+          </form>
+        </div>
+      ) : (
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                render={<Link href="/login" />}
+                className={navigationMenuTriggerStyle()}
+              >
+                Login
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      )}
     </header>
   );
 }

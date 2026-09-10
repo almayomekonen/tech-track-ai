@@ -1,9 +1,14 @@
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd } from "lucide-react";
+import { redirect } from "next/navigation";
+import Image from "next/image";
 
-import { LoginForm } from "@/components/login-form"
-import Image from "next/image"
+import { LoginForm } from "@/components/login-form";
+import { getSession } from "@/lib/authentication";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getSession();
+  if (session) redirect("/");
+
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
