@@ -7,7 +7,7 @@ import { getSession } from "@/lib/authentication";
 
 export default async function LoginPage() {
   const session = await getSession();
-  if (session) redirect("/");
+  if (session) redirect("/assistant");
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">

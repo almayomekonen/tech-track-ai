@@ -6,7 +6,7 @@ const bodySchema = z.object({
   message: z
     .string()
     .min(1)
-    .max(10_000)
+    .max(10000)
     .describe("The message to send to the agent"),
 });
 
@@ -17,6 +17,8 @@ export async function POST(request: Request) {
       { status: 500 },
     );
   }
+
+  console.log(request);
 
   let json: unknown;
 
@@ -39,6 +41,9 @@ export async function POST(request: Request) {
 
   try {
     const result = await run(agent, parsed.data.message);
+
+    console.log(result);
+
     const response =
       result.finalOutput || "I'm sorry, I'm not sure what you mean.";
     return Response.json({ response });
