@@ -1,6 +1,8 @@
 import { run } from "@openai/agents";
 import { agent } from "@/lib/ai/agent";
 import { z } from "zod";
+import { auth } from "@/lib/authentication";
+import { saveMessages } from "@/lib/chat-history";
 
 const bodySchema = z.object({
   message: z
@@ -40,13 +42,31 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await run(agent, parsed.data.message);
-
-    console.log(result);
+    const resultMessage = await run(agent, parsed.data.message);
 
     const response =
-      result.finalOutput || "I'm sorry, I'm not sure what you mean.";
-    return Response.json({ response });
+      resultMessage.finalOutput || "I'm sorry, I'm not sure what you mean.";
+
+    const toolUsed = resultMessage.newItems.flatMap((item) =>
+      item.type === "tool_call_item" && item.rawItem.type === "function_call"
+        ? [{ name: item.rawItem.name, input: item.rawItem.arguments }]
+        : [],
+    );
+
+    const session = await auth();
+
+    const userEmail = session?.user?.email;
+    if (userEmail) {
+      try {
+        await saveMessages(userEmail, [
+          { role: "user", content: parsed.data.message },
+          { role: "assistant", content: response, toolUsed },
+        ]);
+      } catch (error) {
+        console.log(error, "Messages failed to save");
+      }
+    }
+    return Response.json({ response, toolUsed, userEmail });
   } catch (error) {
     return Response.json(
       { error: `failed to run agent: ${error}` },

@@ -1,4 +1,5 @@
 import { Agent } from "@openai/agents";
+import { getInfoTrack } from "./tools/getInfoTrack";
 
 export const agent = new Agent({
   name: "Home Assistant",
@@ -270,4 +271,6 @@ export const agent = new Agent({
   4. Be clear.
   5. Be concise.
   `,
+
+  tools: [getInfoTrack],
 });

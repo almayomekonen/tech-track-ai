@@ -1,4 +1,4 @@
-import { MongoClient, type Collection, type Db, type Document } from "mongodb";
+import { MongoClient, type Db, type Document } from "mongodb";
 
 const globalForMongo = global as unknown as typeof globalThis & {
   mongoClient: MongoClient;
@@ -29,7 +29,9 @@ export const getMongoDb = async () => {
   return client.db("agent-db") as Db;
 };
 
-export const getMongoCollection = async (collectionName: string) => {
+export const getMongoCollection = async <T extends Document = Document>(
+  collectionName: string,
+) => {
   const db = await getMongoDb();
-  return db.collection(collectionName) as Collection<Document>;
+  return db.collection<T>(collectionName);
 };

@@ -13,6 +13,11 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 
+type toolUsed = {
+  name: string
+  input: string
+}
+
 type ChatMessage = {
   id: string;
   role: "user" | "assistant";
